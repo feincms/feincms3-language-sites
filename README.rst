@@ -10,7 +10,9 @@ Multisite support for `feincms3 <https://feincms3.readthedocs.io>`_.
 
 
 * Extend ``feincms3_language_sites.models.AbstractPage`` instead of
-  ``feincms3.pages.AbstractPage``
+  ``feincms3.pages.AbstractPage``. This abstract page already extends
+  ``feincms3.mixins.LanguageAndTranslationOfMixin`` so you do not have to use
+  the mixins adding a language field to the page.
 * Replace the ``LocaleMiddleware`` with
   ``feincms3_language_sites.middleware.site_middleware``
 * Optionally add
