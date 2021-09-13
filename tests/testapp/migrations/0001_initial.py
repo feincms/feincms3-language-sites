@@ -2,9 +2,8 @@
 
 import django.core.validators
 import django.db.models.deletion
-from django.db import migrations, models
-
 import feincms3_sites.models
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):

@@ -9,7 +9,6 @@ from feincms3.applications import (
     reverse_app,
 )
 from feincms3.mixins import LanguageMixin, MenuMixin, RedirectMixin
-
 from feincms3_sites.models import AbstractPage
 
 
