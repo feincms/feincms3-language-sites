@@ -7,14 +7,12 @@ from django.utils.translation import get_language, gettext_lazy as _
 from feincms3 import mixins, pages
 
 
-for language_code, site in settings.SITES.items():
-    site["language_code"] = language_code
-    if "host_re" not in site:
-        site["host_re"] = r"^%s$" % re.escape(site["host"])
-
-
 def site_for_host(host):
     for language_code, site in settings.SITES.items():
+        if "host_re" not in site:
+            site["host_re"] = r"^%s$" % re.escape(site["host"])
+        if "language_code" not in site:
+            site["language_code"] = language_code
         if re.search(site["host_re"], host):
             return site
     return None
