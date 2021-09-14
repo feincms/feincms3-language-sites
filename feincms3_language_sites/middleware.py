@@ -1,25 +1,8 @@
-import contextvars
-from contextlib import contextmanager
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponsePermanentRedirect
 from django.utils import translation
 from django.utils.cache import patch_vary_headers
-
-
-_current_site = contextvars.ContextVar("current_site")
-
-
-@contextmanager
-def set_current_site(site):
-    token = _current_site.set(site)
-    yield
-    _current_site.reset(token)
-
-
-def current_site():
-    return _current_site.get(None)
 
 
 def site_middleware(get_response):
@@ -29,14 +12,14 @@ def site_middleware(get_response):
         request.site = site_for_host(request.get_host())
         if request.site is None:
             raise Http404("No configuration found for %r" % request.get_host())
-        with set_current_site(request.site):
-            translation.activate(request.site["language_code"])
-            request.LANGUAGE_CODE = translation.get_language()
-            response = get_response(request)
-            # Maybe not necessary, but do not take chances.
-            patch_vary_headers(response, ("Accept-Language",))
-            response.setdefault("Content-Language", translation.get_language())
-            return response
+
+        translation.activate(request.site["language_code"])
+        request.LANGUAGE_CODE = translation.get_language()
+        response = get_response(request)
+        # Maybe not necessary, but do not take chances.
+        patch_vary_headers(response, ("Accept-Language",))
+        response.setdefault("Content-Language", translation.get_language())
+        return response
 
     return middleware
 
