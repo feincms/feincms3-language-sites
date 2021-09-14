@@ -24,7 +24,7 @@ def merge_dicts(*dicts):
 class SiteMiddlewareTest(TestCase):
     @override_settings(SITES={"de": {"host": "testserver"}})
     def test_no_404(self):
-        Page.objects.create(
+        page = Page.objects.create(
             title="home",
             slug="home",
             path="/de/",
@@ -33,6 +33,7 @@ class SiteMiddlewareTest(TestCase):
             is_active=True,
         )
         self.assertContains(self.client.get("/de/"), "home - testapp")
+        self.assertEqual(page.get_absolute_url(), "//testserver/de/")
 
     @override_settings(SITES={"de": {"host": "testserver2"}})
     def test_404(self):
