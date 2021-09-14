@@ -1,6 +1,8 @@
 import re
+import sys
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import get_language, gettext_lazy as _
@@ -20,16 +22,32 @@ def site_for_host(host):
     return None
 
 
+CACHE_KEY = "reverse-language-site-app-cache"
+CACHE_TIMEOUT = 60
+
+
 def reverse_language_site_app(*args, **kwargs):
     fields = ("path", "page_type", "app_namespace", "language_code")
-    # TODO maybe cache this. This runs one DB query per invocation
-    kwargs["urlconf"] = apps_urlconf(
-        apps=applications._APPS_MODEL._default_manager.active()
-        .with_tree_fields(False)
-        .exclude(app_namespace="")
-        .values_list(*fields)
-        .order_by(*fields)
-    )
+
+    language_code = get_language()
+    urlconf_map = cache.get(CACHE_KEY)
+    if (
+        not urlconf_map
+        or language_code not in urlconf_map
+        or urlconf_map[language_code] not in sys.modules
+    ):
+        # TODO maybe cache this. This runs one DB query per invocation
+        urlconf_map = urlconf_map or {}
+        urlconf_map[language_code] = apps_urlconf(
+            apps=applications._APPS_MODEL._default_manager.active()
+            .with_tree_fields(False)
+            .exclude(app_namespace="")
+            .values_list(*fields)
+            .order_by(*fields)
+        )
+        cache.set(CACHE_KEY, urlconf_map, timeout=CACHE_TIMEOUT)
+
+    kwargs["urlconf"] = urlconf_map[language_code]
     host = settings.SITES[get_language()]["host"]
     url = reverse_app(*args, **kwargs)
     return f"//{host}{url}"
