@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import override
@@ -96,6 +97,25 @@ class RedirectMiddlewareTest(TestCase):
 
         # self.assertContains(response, "<h1>de</h1>")
         # print(response, response.content.decode("utf-8"))
+
+
+@override_settings(
+    MIDDLEWARE=["feincms3_language_sites.middleware.redirect_to_site_middleware"]
+    + settings.MIDDLEWARE,
+    SITES={"de": {"host": "de.example.com"}},
+)
+class WrongOrderRedirectMiddlewareTest(TestCase):
+    def test_redirect(self):
+        Page.objects.create(
+            page_type="standard",
+            title="de",
+            slug="de",
+            language_code="de",
+            is_active=True,
+        )
+
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get("")
 
 
 @override_settings(
