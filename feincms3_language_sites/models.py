@@ -10,6 +10,8 @@ from feincms3 import applications, pages
 from feincms3.applications import apps_urlconf, reverse_app
 from feincms3.mixins import LanguageAndTranslationOfMixin
 
+import feincms3_language_sites.checks  # noqa
+
 
 def site_for_host(host):
     for language_code, site in settings.SITES.items():

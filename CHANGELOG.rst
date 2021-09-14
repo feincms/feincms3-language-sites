@@ -9,6 +9,7 @@ Change log
 - Removed the contextvars/contextlib helpers; Django already tracks the
   currently active language for us, that should be sufficient.
 - Increased the test coverage.
+- Added checks for the presence and correctness of the ``SITES`` setting.
 
 
 `0.0.1`_ (2021-09-14)

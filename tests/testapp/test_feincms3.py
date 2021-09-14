@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import override
 
+from feincms3_language_sites.checks import check_sites
 from feincms3_language_sites.models import reverse_language_site_app
 
 from .models import Page
@@ -154,3 +155,26 @@ class ReverseAppTest(TestCase):
             with self.assertNumQueries(1):
                 url = reverse_language_site_app("application", "root")
                 self.assertEqual(url, "//fr.example.com/fr/")
+
+
+class ChecksTest(TestCase):
+    def assertCheckCodes(self, errors, codes):
+        self.assertCountEqual({error.id for error in errors}, codes)
+
+    @override_settings()
+    def test_missing(self):
+        del settings.SITES
+
+        self.assertCheckCodes(
+            check_sites(None),
+            {"feincms3_language_sites.E001"},
+        )
+
+    @override_settings(
+        SITES={"it": {"host": "it.example.com"}},
+    )
+    def test_mismatch(self):
+        self.assertCheckCodes(
+            check_sites(None),
+            {"feincms3_language_sites.E002", "feincms3_language_sites.E003"},
+        )

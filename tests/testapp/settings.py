@@ -58,6 +58,9 @@ MIDDLEWARE = [
 ]
 
 SITES = {
+    "en": {
+        "host": "example.org",
+    },
     "de": {
         "host": "127.0.0.1:8000",
         "host_re": r"example\.com$|127.0.0.1:8000$",
