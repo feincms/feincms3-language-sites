@@ -27,7 +27,7 @@ LOGIN_REDIRECT_URL = "/?login=1"
 ALLOWED_HOSTS = ["*"]
 
 ROOT_URLCONF = "testapp.urls"
-LANGUAGES = (("en", "English"), ("de", "German"))
+LANGUAGES = (("en", "English"), ("de", "German"), ("fr", "French"))
 
 TEMPLATES = [
     {

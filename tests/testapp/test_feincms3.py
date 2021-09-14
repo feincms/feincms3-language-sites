@@ -21,10 +21,6 @@ def merge_dicts(*dicts):
     return res
 
 
-@override_settings(
-    MIDDLEWARE=settings.MIDDLEWARE
-    + ["feincms3_language_sites.middleware.site_middleware"],
-)
 class SiteMiddlewareTest(TestCase):
     @override_settings(SITES={"de": {"host": "testserver"}})
     def test_no_404(self):
@@ -49,3 +45,50 @@ class SiteMiddlewareTest(TestCase):
             is_active=True,
         )
         self.assertEqual(self.client.get("/de/").status_code, 404)
+
+
+@override_settings(
+    MIDDLEWARE=settings.MIDDLEWARE
+    + ["feincms3_language_sites.middleware.redirect_to_site_middleware"],
+    SITES={
+        "de": {
+            "host": "de.example.com",
+            "host_re": r"de.example.com|testserver",
+        },
+        "fr": {"host": "fr.example.com"},
+    },
+)
+class RedirectMiddlewareTest(TestCase):
+    def test_redirect(self):
+        Page.objects.create(
+            page_type="standard",
+            title="de",
+            slug="de",
+            language_code="de",
+            is_active=True,
+        )
+        Page.objects.create(
+            page_type="standard",
+            title="fr",
+            slug="fr",
+            language_code="fr",
+            is_active=True,
+        )
+
+        response = self.client.get("/de/", HTTP_HOST="de.example.com")
+        self.assertContains(response, "<h1>de</h1>")
+
+        response = self.client.get("/de/", HTTP_HOST="fr.example.com")
+        self.assertEqual(response.status_code, 404)
+
+        response = self.client.get("/de/")
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response["Location"], "http://de.example.com/de/")
+
+        with override_settings(SECURE_SSL_REDIRECT=True):
+            response = self.client.get("/de/")
+            self.assertEqual(response.status_code, 301)
+            self.assertEqual(response["Location"], "https://de.example.com/de/")
+
+        # self.assertContains(response, "<h1>de</h1>")
+        # print(response, response.content.decode("utf-8"))
