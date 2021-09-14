@@ -2,10 +2,11 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import NoReverseMatch
 from django.utils.translation import override
 
 from feincms3_language_sites.checks import check_sites
-from feincms3_language_sites.models import reverse_language_site_app
+from feincms3_language_sites.models import apps_urlconfs, reverse_language_site_app
 
 from .models import Page
 
@@ -105,6 +106,7 @@ class WrongOrderRedirectMiddlewareTest(TestCase):
 
 @override_settings(
     SITES={
+        "en": {"host": "en.example.com"},
         "de": {"host": "de.example.com"},
         "fr": {"host": "fr.example.com"},
     },
@@ -126,19 +128,29 @@ class ReverseAppTest(TestCase):
             is_active=True,
         )
 
-        with override("de"):
-            with self.assertNumQueries(1):
+        with self.assertNumQueries(1):
+            urlconf_map = apps_urlconfs()
+        self.assertEqual(
+            urlconf_map,
+            {
+                "en": "testapp.urls",
+                "de": "urlconf_fd5a0537769ae95be140eeccf96b8d39",
+                "fr": "urlconf_5a381ea1f57c9d934cf1fac7c23956c0",
+            },
+        )
+
+        with self.assertNumQueries(0):
+            with override("de"):
                 url = reverse_language_site_app("application", "root")
                 self.assertEqual(url, "//de.example.com/de/")
 
-            with self.assertNumQueries(0):
-                url = reverse_language_site_app("application", "root")
-                self.assertEqual(url, "//de.example.com/de/")
-
-        with override("fr"):
-            with self.assertNumQueries(1):
+            with override("fr"):
                 url = reverse_language_site_app("application", "root")
                 self.assertEqual(url, "//fr.example.com/fr/")
+
+            with override("en"):
+                with self.assertRaises(NoReverseMatch):
+                    reverse_language_site_app("application", "root")
 
 
 class ChecksTest(TestCase):

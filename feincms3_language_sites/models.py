@@ -28,30 +28,34 @@ CACHE_KEY = "reverse-language-site-app-cache"
 CACHE_TIMEOUT = 60
 
 
-def reverse_language_site_app(*args, **kwargs):
-    fields = ("path", "page_type", "app_namespace", "language_code")
-
-    language_code = get_language()
+def apps_urlconfs():
     urlconf_map = cache.get(CACHE_KEY)
-    if (
-        not urlconf_map
-        or language_code not in urlconf_map
-        or urlconf_map[language_code] not in sys.modules
+    if not urlconf_map or any(
+        module for module in urlconf_map.values() if module not in sys.modules
     ):
-        # TODO maybe cache this. This runs one DB query per invocation
-        urlconf_map = urlconf_map or {}
-        urlconf_map[language_code] = apps_urlconf(
-            apps=applications._APPS_MODEL._default_manager.active()
+        fields = ("path", "page_type", "app_namespace", "language_code")
+        apps = {code: [] for code, name in settings.LANGUAGES}
+        for app in (
+            applications._APPS_MODEL._default_manager.filter(is_active=True)
             .with_tree_fields(False)
             .exclude(app_namespace="")
             .values_list(*fields)
             .order_by(*fields)
-        )
-        cache.set(CACHE_KEY, urlconf_map, timeout=CACHE_TIMEOUT)
+        ):
+            apps[app[-1]].append(app)
 
-    kwargs["urlconf"] = urlconf_map[language_code]
+        urlconf_map = {
+            code: apps_urlconf(apps=site_apps) for code, site_apps in apps.items()
+        }
+        cache.set(CACHE_KEY, urlconf_map, timeout=CACHE_TIMEOUT)
+    return urlconf_map
+
+
+def reverse_language_site_app(*args, **kwargs):
+    language_code = get_language()
+    kwargs["urlconf"] = apps_urlconfs()[language_code]
+    url = reverse_app(*args, **kwargs, languages=[language_code])
     host = settings.SITES[language_code]["host"]
-    url = reverse_app(*args, **kwargs)
     return f"//{host}{url}"
 
 
