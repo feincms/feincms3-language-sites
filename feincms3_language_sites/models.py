@@ -48,7 +48,7 @@ def reverse_language_site_app(*args, **kwargs):
         cache.set(CACHE_KEY, urlconf_map, timeout=CACHE_TIMEOUT)
 
     kwargs["urlconf"] = urlconf_map[language_code]
-    host = settings.SITES[get_language()]["host"]
+    host = settings.SITES[language_code]["host"]
     url = reverse_app(*args, **kwargs)
     return f"//{host}{url}"
 
