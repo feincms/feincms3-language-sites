@@ -4,7 +4,9 @@ from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import get_language, gettext_lazy as _
-from feincms3 import mixins, pages
+from feincms3 import applications, pages
+from feincms3.applications import apps_urlconf, reverse_app
+from feincms3.mixins import LanguageAndTranslationOfMixin
 
 
 def site_for_host(host):
@@ -18,6 +20,21 @@ def site_for_host(host):
     return None
 
 
+def reverse_language_site_app(*args, **kwargs):
+    fields = ("path", "page_type", "app_namespace", "language_code")
+    # TODO maybe cache this. This runs one DB query per invocation
+    kwargs["urlconf"] = apps_urlconf(
+        apps=applications._APPS_MODEL._default_manager.active()
+        .with_tree_fields(False)
+        .exclude(app_namespace="")
+        .values_list(*fields)
+        .order_by(*fields)
+    )
+    host = settings.SITES[get_language()]["host"]
+    url = reverse_app(*args, **kwargs)
+    return f"//{host}{url}"
+
+
 class AbstractPageQuerySet(pages.AbstractPageQuerySet):
     def active(self, *, language_code=None):
         return self.filter(
@@ -25,7 +42,7 @@ class AbstractPageQuerySet(pages.AbstractPageQuerySet):
         )
 
 
-class AbstractPage(pages.AbstractPage, mixins.LanguageAndTranslationOfMixin):
+class AbstractPage(pages.AbstractPage, LanguageAndTranslationOfMixin):
     # Exactly the same as BasePage.path,
     # except that it is not unique:
     path = models.CharField(

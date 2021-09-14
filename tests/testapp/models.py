@@ -1,13 +1,12 @@
 from content_editor.models import Region, create_plugin_base
 from django.utils.translation import gettext_lazy as _
 from feincms3 import plugins
-from feincms3.applications import PageTypeMixin, TemplateType
+from feincms3.applications import ApplicationType, PageTypeMixin, TemplateType
 
 from feincms3_language_sites.models import AbstractPage
 
 
 class Page(AbstractPage, PageTypeMixin):
-    # PageTypeMixin. We have two templates and four apps.
     TYPES = [
         TemplateType(
             key="standard",
@@ -23,6 +22,11 @@ class Page(AbstractPage, PageTypeMixin):
                 Region(key="main", title=_("Main")),
                 Region(key="sidebar", title=_("Sidebar")),
             ),
+        ),
+        ApplicationType(
+            key="application",
+            title=_("application"),
+            urlconf="testapp.application_urls",
         ),
     ]
 

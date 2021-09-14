@@ -1,6 +1,9 @@
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.translation import override
+
+from feincms3_language_sites.models import reverse_language_site_app
 
 from .models import Page
 
@@ -93,3 +96,35 @@ class RedirectMiddlewareTest(TestCase):
 
         # self.assertContains(response, "<h1>de</h1>")
         # print(response, response.content.decode("utf-8"))
+
+
+@override_settings(
+    SITES={
+        "de": {"host": "de.example.com"},
+        "fr": {"host": "fr.example.com"},
+    },
+)
+class ReverseAppTest(TestCase):
+    def test_reverse_app(self):
+        Page.objects.create(
+            page_type="application",
+            title="de",
+            slug="de",
+            language_code="de",
+            is_active=True,
+        )
+        Page.objects.create(
+            page_type="application",
+            title="fr",
+            slug="fr",
+            language_code="fr",
+            is_active=True,
+        )
+
+        with override("de"):
+            url = reverse_language_site_app("application", "root")
+            self.assertEqual(url, "//de.example.com/de/")
+
+        with override("fr"):
+            url = reverse_language_site_app("application", "root")
+            self.assertEqual(url, "//fr.example.com/fr/")
