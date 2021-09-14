@@ -142,9 +142,15 @@ class ReverseAppTest(TestCase):
         )
 
         with override("de"):
-            url = reverse_language_site_app("application", "root")
-            self.assertEqual(url, "//de.example.com/de/")
+            with self.assertNumQueries(1):
+                url = reverse_language_site_app("application", "root")
+                self.assertEqual(url, "//de.example.com/de/")
+
+            with self.assertNumQueries(0):
+                url = reverse_language_site_app("application", "root")
+                self.assertEqual(url, "//de.example.com/de/")
 
         with override("fr"):
-            url = reverse_language_site_app("application", "root")
-            self.assertEqual(url, "//fr.example.com/fr/")
+            with self.assertNumQueries(1):
+                url = reverse_language_site_app("application", "root")
+                self.assertEqual(url, "//fr.example.com/fr/")
