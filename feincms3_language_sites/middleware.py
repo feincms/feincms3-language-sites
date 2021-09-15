@@ -2,7 +2,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponsePermanentRedirect
 from django.utils import translation
-from django.utils.cache import patch_vary_headers
 
 
 def site_middleware(get_response):
@@ -16,8 +15,6 @@ def site_middleware(get_response):
         translation.activate(request.site["language_code"])
         request.LANGUAGE_CODE = translation.get_language()
         response = get_response(request)
-        # Maybe not necessary, but do not take chances.
-        patch_vary_headers(response, ("Accept-Language",))
         response.setdefault("Content-Language", translation.get_language())
         return response
 
