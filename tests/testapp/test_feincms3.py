@@ -13,7 +13,7 @@ from .models import Page
 
 class SiteMiddlewareTest(TestCase):
     @override_settings(SITES={"de": {"host": "testserver"}})
-    def test_no_404(self):
+    def test_no_400(self):
         page = Page.objects.create(
             title="home",
             slug="home",
@@ -26,7 +26,7 @@ class SiteMiddlewareTest(TestCase):
         self.assertEqual(page.get_absolute_url(), "//testserver/de/")
 
     @override_settings(SITES={"de": {"host": "testserver2"}})
-    def test_404(self):
+    def test_400(self):
         Page.objects.create(
             title="home",
             slug="home",
@@ -35,7 +35,7 @@ class SiteMiddlewareTest(TestCase):
             language_code="de",
             is_active=True,
         )
-        self.assertEqual(self.client.get("/de/").status_code, 404)
+        self.assertEqual(self.client.get("/de/").status_code, 400)
 
 
 @override_settings(

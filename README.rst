@@ -69,7 +69,9 @@ The keys of the ``SITES`` dictionary have to be equal to all language codes in
 an optional port, nothing else. The ``host_re`` is automatically derived from
 ``host`` if it isn't given explicitly and is matched against
 ``request.get_host()`` to find the current site. If no ``host_re`` matches the
-``site_middleware`` automatically raises a ``Http404`` exception.
+``site_middleware`` automatically raises a ``DisallowedHost`` exception (which
+produces the same error as Django if the request doesn't match
+``ALLOWED_HOSTS``).
 
 
 Utilities

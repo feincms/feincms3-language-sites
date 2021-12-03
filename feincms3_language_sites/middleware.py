@@ -1,6 +1,6 @@
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.http import Http404, HttpResponsePermanentRedirect
+from django.core.exceptions import DisallowedHost, ImproperlyConfigured
+from django.http import HttpResponsePermanentRedirect
 from django.utils import translation
 
 
@@ -10,7 +10,7 @@ def site_middleware(get_response):
     def middleware(request):
         request.site = site_for_host(request.get_host())
         if request.site is None:
-            raise Http404("No configuration found for %r" % request.get_host())
+            raise DisallowedHost("No configuration found for %r" % request.get_host())
 
         translation.activate(request.site["language_code"])
         request.LANGUAGE_CODE = translation.get_language()
