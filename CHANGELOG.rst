@@ -13,6 +13,7 @@ Change log
 - Added Python 3.10, Django 4.0rc1 to the CI.
 - Changed the code to raise a ``DisallowedHost`` exception instead of a 404 if
   unable to find a matching host for the current request.
+- Switched to pre-commit.
 
 
 `0.0.1`_ (2021-09-14)
