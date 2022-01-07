@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch
@@ -174,3 +174,38 @@ class ChecksTest(TestCase):
             check_sites(None),
             {"feincms3_language_sites.E002", "feincms3_language_sites.E003"},
         )
+
+
+@override_settings(
+    SITES={
+        "en": {"host": "en.example.com"},
+        "de": {"host": "de.example.com"},
+        "fr": {"host": "fr.example.com"},
+    },
+)
+class PagesModelTest(TestCase):
+    def test_validation(self):
+        page_de = Page.objects.create(
+            title="home",
+            slug="home",
+            path="/",
+            static_path=True,
+            language_code="de",
+            is_active=True,
+        )
+        page_en = Page.objects.create(
+            title="home",
+            slug="home",
+            path="/",
+            static_path=True,
+            language_code="en",
+            is_active=True,
+        )
+
+        # Doesn't raise
+        page_de.full_clean()
+        page_en.full_clean()
+
+        with self.assertRaises(ValidationError):
+            page_en.language_code = "de"
+            page_en.full_clean()
