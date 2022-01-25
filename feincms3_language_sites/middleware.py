@@ -30,18 +30,20 @@ def redirect_to_site_middleware(get_response):
             )
 
         # Host matches, and either no HTTPS enforcement or already HTTPS
-        if request.get_host() == request.site["host"] and (
-            not settings.SECURE_SSL_REDIRECT or request.is_secure()
+        # Do a redirect if
+        # - Host doesn't match
+        # - We should be on HTTPS but are not
+        if request.get_host() != request.site["host"] or (
+            settings.SECURE_SSL_REDIRECT and not request.is_secure()
         ):
-            return get_response(request)
-
-        return HttpResponsePermanentRedirect(
-            "http%s://%s%s"
-            % (
-                "s" if (settings.SECURE_SSL_REDIRECT or request.is_secure()) else "",
-                request.site["host"],
-                request.get_full_path(),
+            if settings.SECURE_SSL_REDIRECT or request.is_secure():
+                protocol = "https"
+            else:
+                protocol = "http"
+            return HttpResponsePermanentRedirect(
+                f'{protocol}://{request.site["host"]}{request.get_full_path()}'
             )
-        )
+
+        return get_response(request)
 
     return middleware

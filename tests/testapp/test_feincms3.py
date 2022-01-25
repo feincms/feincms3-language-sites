@@ -77,9 +77,35 @@ class RedirectMiddlewareTest(TestCase):
         self.assertEqual(response["Location"], "http://de.example.com/de/")
 
         with override_settings(SECURE_SSL_REDIRECT=True):
-            response = self.client.get("/de/")
+            response = self.client.get("/de/", secure=False)
             self.assertEqual(response.status_code, 301)
             self.assertEqual(response["Location"], "https://de.example.com/de/")
+
+            response = self.client.get("/de/", secure=True)
+            self.assertEqual(response.status_code, 301)
+            self.assertEqual(response["Location"], "https://de.example.com/de/")
+
+            response = self.client.get("/de/", HTTP_HOST="de.example.com", secure=False)
+            self.assertEqual(response.status_code, 301)
+            self.assertEqual(response["Location"], "https://de.example.com/de/")
+
+            response = self.client.get("/de/", HTTP_HOST="de.example.com", secure=True)
+            self.assertEqual(response.status_code, 200)
+
+        with override_settings(SECURE_SSL_REDIRECT=False):
+            response = self.client.get("/de/", secure=False)
+            self.assertEqual(response.status_code, 301)
+            self.assertEqual(response["Location"], "http://de.example.com/de/")
+
+            response = self.client.get("/de/", secure=True)
+            self.assertEqual(response.status_code, 301)
+            self.assertEqual(response["Location"], "https://de.example.com/de/")
+
+            response = self.client.get("/de/", HTTP_HOST="de.example.com", secure=False)
+            self.assertEqual(response.status_code, 200)
+
+            response = self.client.get("/de/", HTTP_HOST="de.example.com", secure=True)
+            self.assertEqual(response.status_code, 200)
 
         # self.assertContains(response, "<h1>de</h1>")
         # print(response, response.content.decode("utf-8"))
