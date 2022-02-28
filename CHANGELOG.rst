@@ -16,6 +16,8 @@ Change log
 - Switched to pre-commit.
 - Fixed a bug where the ``redirect_to_site_middleware`` would redirect too
   often.
+- Added a ``AbstractPage.site`` property returning the site for the page's
+  language.
 
 
 `0.0.1`_ (2021-09-14)

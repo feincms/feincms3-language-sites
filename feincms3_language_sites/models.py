@@ -97,7 +97,11 @@ class AbstractPage(pages.AbstractPage, LanguageAndTranslationOfMixin):
     def _path_clash_candidates(self):
         return super()._path_clash_candidates().filter(language_code=self.language_code)
 
+    @property
+    def site(self):
+        return settings.SITES[self.language_code]
+
     def get_absolute_url(self):
-        host = settings.SITES[self.language_code]["host"]
+        host = self.site["host"]
         url = super().get_absolute_url()
         return f"//{host}{url}"
