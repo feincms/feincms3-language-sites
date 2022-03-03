@@ -18,6 +18,8 @@ Change log
   often.
 - Added a ``AbstractPage.site`` property returning the site for the page's
   language.
+- Added an additional ``unique_together`` constraint for the
+  ``LanguageAndTranslationOfMixin``.
 
 
 `0.0.1`_ (2021-09-14)
