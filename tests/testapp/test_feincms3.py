@@ -1,12 +1,16 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import isolate_apps, override_settings
 from django.urls import NoReverseMatch
 from django.utils.translation import override
 
 from feincms3_language_sites.checks import check_sites
-from feincms3_language_sites.models import apps_urlconfs, reverse_language_site_app
+from feincms3_language_sites.models import (
+    AbstractPage,
+    apps_urlconfs,
+    reverse_language_site_app,
+)
 from feincms3_language_sites.templatetags.feincms3_language_sites import (
     site_translations,
 )
@@ -293,3 +297,15 @@ class PagesModelTest(TestCase):
             [lang["code"] for lang in site_translations("page")],
             ["en", "de", "fr"],
         )
+
+    @isolate_apps("testapp")
+    def test_page_with_missing_unique_together(self):
+        """Page subclass without unique_together fails validation"""
+
+        class Page(AbstractPage):
+            class Meta:
+                pass
+
+        errors = Page.check()
+        error_ids = [error.id for error in errors]
+        self.assertIn("feincms3_language_sites.E001", error_ids)
