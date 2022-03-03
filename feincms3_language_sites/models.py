@@ -3,6 +3,7 @@ import sys
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.checks import Error
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import get_language, gettext_lazy as _
@@ -90,9 +91,30 @@ class AbstractPage(pages.AbstractPage, LanguageAndTranslationOfMixin):
     class Meta:
         abstract = True
         ordering = ["position"]
-        unique_together = [("language_code", "path")]
+        unique_together = [
+            ("language_code", "path"),
+            ("language_code", "translation_of"),
+        ]
         verbose_name = _("page")
         verbose_name_plural = _("pages")
+
+    @classmethod
+    def check(cls, **kwargs):
+        errors = super().check(**kwargs)
+        errors.extend(cls._check_feincms3_language_sites_page(**kwargs))
+        return errors
+
+    @classmethod
+    def _check_feincms3_language_sites_page(cls, **kwargs):
+        unique_together = [set(fields) for fields in cls._meta.unique_together]
+        if {"language_code", "path"} not in unique_together:
+            yield Error(
+                "Models using the feincms3-language-sites page must ensure"
+                " that paths exist only once per language.",
+                obj=cls,
+                id="feincms3_language_sites.E001",
+                hint='Add ("language_code", "path") to unique_together.',
+            )
 
     def _path_clash_candidates(self):
         return super()._path_clash_candidates().filter(language_code=self.language_code)
