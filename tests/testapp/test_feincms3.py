@@ -286,28 +286,10 @@ class PagesModelTest(TestCase):
         )
 
         self.assertEqual(
-            site_translations(""),
-            [
-                {
-                    "code": "en",
-                    "name": "English",
-                    "object": None,
-                    "site": {"host": "en.example.com"},
-                    "site_link": "//en.example.com",
-                },
-                {
-                    "code": "de",
-                    "name": "German",
-                    "object": None,
-                    "site": {"host": "de.example.com"},
-                    "site_link": "//de.example.com",
-                },
-                {
-                    "code": "fr",
-                    "name": "French",
-                    "object": None,
-                    "site": {"host": "fr.example.com"},
-                    "site_link": "//fr.example.com",
-                },
-            ],
+            [lang["code"] for lang in site_translations(None)],
+            ["en", "de", "fr"],
+        )
+        self.assertEqual(
+            [lang["code"] for lang in site_translations("page")],
+            ["en", "de", "fr"],
         )
