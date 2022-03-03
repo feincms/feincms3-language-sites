@@ -88,15 +88,12 @@ class AbstractPage(pages.AbstractPage, LanguageAndTranslationOfMixin):
 
     objects = AbstractPageQuerySet.as_manager(with_tree_fields=True)
 
-    class Meta:
+    class Meta(pages.AbstractPage.Meta):
         abstract = True
-        ordering = ["position"]
         unique_together = [
             ("language_code", "path"),
             ("language_code", "translation_of"),
         ]
-        verbose_name = _("page")
-        verbose_name_plural = _("pages")
 
     @classmethod
     def check(cls, **kwargs):
