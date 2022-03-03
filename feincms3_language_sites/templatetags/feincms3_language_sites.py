@@ -16,5 +16,7 @@ def site_translations(page):
             "site": settings.SITES[item["code"]],
             "site_link": "//" + settings.SITES[item["code"]]["host"],
         }
-        for item in translations(page.translations().filter(is_active=True))
+        for item in translations(
+            page.translations().filter(is_active=True) if page else None
+        )
     ]
