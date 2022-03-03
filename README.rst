@@ -79,6 +79,7 @@ Utilities
 
 * ``feincms3_language_sites.models.site_for_host``
 * ``feincms3_language_sites.models.reverse_language_site_app``
+* ``feincms3_language_sites.templatetags.feincms3_language_sites.site_translations``
 
 
 Notes

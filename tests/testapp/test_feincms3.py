@@ -7,6 +7,9 @@ from django.utils.translation import override
 
 from feincms3_language_sites.checks import check_sites
 from feincms3_language_sites.models import apps_urlconfs, reverse_language_site_app
+from feincms3_language_sites.templatetags.feincms3_language_sites import (
+    site_translations,
+)
 
 from .models import Page
 
@@ -235,3 +238,49 @@ class PagesModelTest(TestCase):
         with self.assertRaises(ValidationError):
             page_en.language_code = "de"
             page_en.full_clean()
+
+    def test_site_translations_filter(self):
+        page_en = Page.objects.create(
+            title="home",
+            slug="home",
+            path="/home/",
+            static_path=True,
+            language_code="en",
+            is_active=True,
+        )
+        page_de = Page.objects.create(
+            title="start",
+            slug="start",
+            path="/start/",
+            static_path=True,
+            language_code="de",
+            is_active=True,
+            translation_of=page_en,
+        )
+
+        self.assertEqual(
+            site_translations(page_de),
+            [
+                {
+                    "code": "en",
+                    "name": "English",
+                    "object": page_en,
+                    "site": {"host": "en.example.com"},
+                    "site_link": "//en.example.com",
+                },
+                {
+                    "code": "de",
+                    "name": "German",
+                    "object": page_de,
+                    "site": {"host": "de.example.com"},
+                    "site_link": "//de.example.com",
+                },
+                {
+                    "code": "fr",
+                    "name": "French",
+                    "object": None,
+                    "site": {"host": "fr.example.com"},
+                    "site_link": "//fr.example.com",
+                },
+            ],
+        )

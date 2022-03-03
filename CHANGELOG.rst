@@ -20,6 +20,8 @@ Change log
   language.
 - Added an additional ``unique_together`` constraint for the
   ``LanguageAndTranslationOfMixin``.
+- Added a template filter for easily generating links to translated content on
+  other sites.
 
 
 `0.0.1`_ (2021-09-14)
