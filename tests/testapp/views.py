@@ -1,15 +1,15 @@
 from django.shortcuts import get_object_or_404, render
-from feincms3.regions import Regions
-from feincms3.renderer import TemplatePluginRenderer
+from feincms3.renderer import RegionRenderer, render_in_context
 
 from .models import Page, Snippet
 
 
-renderer = TemplatePluginRenderer()
-renderer.register_template_renderer(
+renderer = RegionRenderer()
+renderer.register(
     Snippet,
-    lambda plugin: plugin.template_name,
-    lambda plugin, context: {"additional": "context"},
+    lambda plugin, context: render_in_context(
+        context, plugin.template_name, {"additional": "context"}
+    ),
 )
 
 
@@ -24,8 +24,8 @@ def page_detail(request, path=None):
         page.type.template_name,
         {
             "page": page,
-            "regions": Regions.from_item(
-                page, renderer=renderer, inherit_from=page.ancestors().reverse()
+            "regions": renderer.regions_from_item(
+                page, inherit_from=page.ancestors().reverse()
             ),
         },
     )
