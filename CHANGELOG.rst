@@ -10,7 +10,7 @@ Change log
   currently active language for us, that should be sufficient.
 - Increased the test coverage.
 - Added checks for the presence and correctness of the ``SITES`` setting.
-- Added Python 3.10, Django 4.0rc1 to the CI.
+- Added Python 3.10, Django 4.0, 4.1 to the CI.
 - Changed the code to raise a ``DisallowedHost`` exception instead of a 404 if
   unable to find a matching host for the current request.
 - Switched to pre-commit.
