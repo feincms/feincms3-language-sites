@@ -21,5 +21,5 @@ urlpatterns = i18n_patterns(
 ) + [
     re_path(r"^admin/", admin.site.urls),
     path("404/", lambda request: render(request, "404.html")),
-    re_path(r"", include(pages_urlpatterns)),
+    path("", include(pages_urlpatterns)),
 ]
