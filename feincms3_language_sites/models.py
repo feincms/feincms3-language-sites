@@ -43,6 +43,9 @@ def apps_urlconfs():
             .values_list(*fields)
             .order_by(*fields)
         ):
+            # Skip apps with languages not in LANGUAGES
+            if app[-1] not in apps:
+                continue
             apps[app[-1]].append(app)
 
         urlconf_map = {

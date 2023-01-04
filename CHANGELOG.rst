@@ -22,6 +22,8 @@ Change log
   ``LanguageAndTranslationOfMixin``.
 - Added a template filter for easily generating links to translated content on
   other sites.
+- Fixed a crash which happened when the database contained apps in languages
+  which have been removed from the ``LANGUAGES`` setting in the meantime.
 
 
 `0.0.1`_ (2021-09-14)

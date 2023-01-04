@@ -7,8 +7,10 @@ from django.utils.translation import override
 
 from feincms3_language_sites.checks import check_sites
 from feincms3_language_sites.models import (
+    CACHE_KEY,
     AbstractPage,
     apps_urlconfs,
+    cache,
     reverse_language_site_app,
 )
 from feincms3_language_sites.templatetags.feincms3_language_sites import (
@@ -145,6 +147,9 @@ class WrongOrderRedirectMiddlewareTest(TestCase):
     },
 )
 class ReverseAppTest(TestCase):
+    def setUp(self):
+        cache.delete(CACHE_KEY)
+
     def test_reverse_app(self):
         Page.objects.create(
             page_type="application",
@@ -184,6 +189,20 @@ class ReverseAppTest(TestCase):
             with override("en"):
                 with self.assertRaises(NoReverseMatch):
                     reverse_language_site_app("application", "root")
+
+    def test_invalid_language(self):
+        # "it" doesn't exist in LANGUAGES
+        Page.objects.create(
+            page_type="application",
+            title="it",
+            slug="it",
+            language_code="it",
+            is_active=True,
+        )
+        self.assertEqual(
+            apps_urlconfs(),
+            {"en": "testapp.urls", "de": "testapp.urls", "fr": "testapp.urls"},
+        )
 
 
 class ChecksTest(TestCase):
