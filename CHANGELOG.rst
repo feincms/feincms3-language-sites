@@ -5,6 +5,9 @@ Change log
 Next version
 ~~~~~~~~~~~~
 
+0.1 (2023-07-07)
+~~~~~~~~~~~~~~~~
+
 - Started writing a CHANGELOG.
 - Removed the contextvars/contextlib helpers; Django already tracks the
   currently active language for us, that should be sufficient.
@@ -34,4 +37,3 @@ Next version
 - Initial public version.
 
 .. _0.0.1: https://github.com/matthiask/feincms3-language-sites/commit/7a63ed5bf
-.. _Next version: https://github.com/matthiask/feincms3-language-sites/compare/0.12...main
