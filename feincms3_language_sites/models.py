@@ -14,6 +14,10 @@ from feincms3.mixins import LanguageAndTranslationOfMixin
 import feincms3_language_sites.checks  # noqa: F401
 
 
+def _protocol():
+    return "https:" if settings.SECURE_SSL_REDIRECT else "http:"
+
+
 def site_for_host(host):
     for language_code, site in settings.SITES.items():
         site.setdefault("language_code", language_code)
@@ -60,7 +64,7 @@ def reverse_language_site_app(*args, **kwargs):
     kwargs["urlconf"] = apps_urlconfs()[language_code]
     url = reverse_app(*args, **kwargs, languages=[language_code])
     host = settings.SITES[language_code]["host"]
-    return f"//{host}{url}"
+    return f"{_protocol()}//{host}{url}"
 
 
 class AbstractPageQuerySet(pages.AbstractPageQuerySet):
@@ -126,4 +130,4 @@ class AbstractPage(pages.AbstractPage, LanguageAndTranslationOfMixin):
     def get_absolute_url(self):
         host = self.site["host"]
         url = super().get_absolute_url()
-        return f"//{host}{url}"
+        return f"{_protocol()}//{host}{url}"

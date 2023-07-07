@@ -24,6 +24,8 @@ Next version
   other sites.
 - Fixed a crash which happened when the database contained apps in languages
   which have been removed from the ``LANGUAGES`` setting in the meantime.
+- Stopped producing protocol-relative URLs, rely on the ``SECURE_SSL_REDIRECT``
+  setting instead.
 
 
 `0.0.1`_ (2021-09-14)

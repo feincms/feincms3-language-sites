@@ -31,7 +31,7 @@ class SiteMiddlewareTest(TestCase):
             is_active=True,
         )
         self.assertContains(self.client.get("/de/"), "home - testapp")
-        self.assertEqual(page.get_absolute_url(), "//testserver/de/")
+        self.assertEqual(page.get_absolute_url(), "http://testserver/de/")
 
     @override_settings(SITES={"de": {"host": "testserver2"}})
     def test_400(self):
@@ -179,11 +179,11 @@ class ReverseAppTest(TestCase):
         with self.assertNumQueries(0):
             with override("de"):
                 url = reverse_language_site_app("application", "root")
-                self.assertEqual(url, "//de.example.com/de/")
+                self.assertEqual(url, "http://de.example.com/de/")
 
             with override("fr"):
                 url = reverse_language_site_app("application", "root")
-                self.assertEqual(url, "//fr.example.com/fr/")
+                self.assertEqual(url, "http://fr.example.com/fr/")
 
             with override("en"), self.assertRaises(NoReverseMatch):
                 reverse_language_site_app("application", "root")
