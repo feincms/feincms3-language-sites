@@ -3,7 +3,7 @@ from django.contrib import admin
 from feincms3 import plugins
 from feincms3.admin import TreeAdmin
 
-from . import models
+from testapp import models
 
 
 @admin.register(models.Page)

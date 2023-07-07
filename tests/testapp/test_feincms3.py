@@ -16,8 +16,7 @@ from feincms3_language_sites.models import (
 from feincms3_language_sites.templatetags.feincms3_language_sites import (
     site_translations,
 )
-
-from .models import Page
+from testapp.models import Page
 
 
 class SiteMiddlewareTest(TestCase):
@@ -186,9 +185,8 @@ class ReverseAppTest(TestCase):
                 url = reverse_language_site_app("application", "root")
                 self.assertEqual(url, "//fr.example.com/fr/")
 
-            with override("en"):
-                with self.assertRaises(NoReverseMatch):
-                    reverse_language_site_app("application", "root")
+            with override("en"), self.assertRaises(NoReverseMatch):
+                reverse_language_site_app("application", "root")
 
     def test_invalid_language(self):
         # "it" doesn't exist in LANGUAGES
@@ -206,7 +204,7 @@ class ReverseAppTest(TestCase):
 
 
 class ChecksTest(TestCase):
-    def assertCheckCodes(self, errors, codes):
+    def assertCheckCodes(self, errors, codes):  # noqa: N802
         self.assertCountEqual({error.id for error in errors}, codes)
 
     @override_settings()

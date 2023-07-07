@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from feincms3.renderer import RegionRenderer, render_in_context
 
-from .models import Page, Snippet
+from testapp.models import Page, Snippet
 
 
 renderer = RegionRenderer()

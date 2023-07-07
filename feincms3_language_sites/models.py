@@ -11,7 +11,7 @@ from feincms3 import applications, pages
 from feincms3.applications import apps_urlconf, reverse_app
 from feincms3.mixins import LanguageAndTranslationOfMixin
 
-import feincms3_language_sites.checks  # noqa
+import feincms3_language_sites.checks  # noqa: F401
 
 
 def site_for_host(host):
@@ -38,7 +38,7 @@ def apps_urlconfs():
         apps = {code: [] for code, name in settings.LANGUAGES}
         for app in (
             applications._APPS_MODEL._default_manager.filter(is_active=True)
-            .with_tree_fields(False)
+            .without_tree_fields()
             .exclude(app_namespace="")
             .values_list(*fields)
             .order_by(*fields)
