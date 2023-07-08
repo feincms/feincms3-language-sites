@@ -181,6 +181,9 @@ class ReverseAppTest(TestCase):
                 url = reverse_language_site_app("application", "root")
                 self.assertEqual(url, "http://de.example.com/de/")
 
+                url = reverse_language_site_app("does-not-exist", "view", fallback="/")
+                self.assertEqual(url, "http://de.example.com/")
+
             with override("fr"):
                 url = reverse_language_site_app("application", "root")
                 self.assertEqual(url, "http://fr.example.com/fr/")
