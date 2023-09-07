@@ -84,6 +84,11 @@ class RedirectMiddlewareTest(TestCase):
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response["Location"], "http://de.example.com/de/")
 
+        with override_settings(DEBUG=True):
+            response = self.client.get("/de/")
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response["Location"], "http://de.example.com/de/")
+
         with override_settings(SECURE_SSL_REDIRECT=True):
             response = self.client.get("/de/", secure=False)
             self.assertEqual(response.status_code, 301)

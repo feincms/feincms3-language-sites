@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import DisallowedHost, ImproperlyConfigured
-from django.http import HttpResponsePermanentRedirect
+from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.utils import translation
 
 
@@ -40,7 +40,12 @@ def redirect_to_site_middleware(get_response):
                 protocol = "https"
             else:
                 protocol = "http"
-            return HttpResponsePermanentRedirect(
+            redirect_class = (
+                HttpResponseRedirect
+                if settings.DEBUG
+                else HttpResponsePermanentRedirect
+            )
+            return redirect_class(
                 f'{protocol}://{request.site["host"]}{request.get_full_path()}'
             )
 
