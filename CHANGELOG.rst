@@ -5,6 +5,8 @@ Change log
 Next version
 ~~~~~~~~~~~~
 
+- Fixed the applications clash check.
+
 
 0.2 (2023-09-07)
 ~~~~~~~~~~~~~~~~

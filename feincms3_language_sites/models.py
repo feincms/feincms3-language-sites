@@ -120,8 +120,8 @@ class AbstractPage(pages.AbstractPage, LanguageAndTranslationOfMixin):
                 hint='Add ("language_code", "path") to unique_together.',
             )
 
-    def _path_clash_candidates(self):
-        return super()._path_clash_candidates().filter(language_code=self.language_code)
+    def _clash_candidates(self):
+        return super()._clash_candidates().filter(language_code=self.language_code)
 
     @property
     def site(self):
