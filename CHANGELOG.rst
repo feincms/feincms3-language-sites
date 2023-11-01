@@ -5,6 +5,9 @@ Change log
 Next version
 ~~~~~~~~~~~~
 
+0.3 (2023-11-01)
+~~~~~~~~~~~~~~~~
+
 - Fixed the applications clash check.
 - Dropped compatibility with Python 3.8 since we're requiring ``feincms3>=4.5``
   now which only supports Python 3.9 or better.
