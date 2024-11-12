@@ -9,7 +9,7 @@ from testapp import views
 
 pages_urlpatterns = (
     [
-        path("", lambda request: HttpResponseRedirect("/%s/" % request.LANGUAGE_CODE)),
+        path("", lambda request: HttpResponseRedirect(f"/{request.LANGUAGE_CODE}/")),
         re_path(r"^(?P<path>[-\w/]+)/$", views.page_detail, name="page"),
         path("", views.page_detail, name="root"),
     ],

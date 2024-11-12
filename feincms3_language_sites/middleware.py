@@ -10,7 +10,7 @@ def site_middleware(get_response):
     def middleware(request):
         request.site = site_for_host(request.get_host())
         if request.site is None:
-            raise DisallowedHost("No configuration found for %r" % request.get_host())
+            raise DisallowedHost(f"No configuration found for {request.get_host()!r}")
 
         translation.activate(request.site["language_code"])
         request.LANGUAGE_CODE = translation.get_language()

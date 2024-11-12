@@ -14,9 +14,7 @@ renderer.register(
 
 
 def page_detail(request, path=None):
-    page = get_object_or_404(
-        Page.objects.active(), path=("/%s/" % path) if path else "/"
-    )
+    page = get_object_or_404(Page.objects.active(), path=(f"/{path}/") if path else "/")
     page.activate_language(request)
 
     return render(
