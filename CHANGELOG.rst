@@ -5,7 +5,12 @@ Change log
 Next version
 ~~~~~~~~~~~~
 
+0.4 (2024-11-12)
+~~~~~~~~~~~~~~~~
+
 - Raised minimum versions to Python 3.10, Django 4.2.
+- Added support for the improved page move validation supported in
+  ``feincms3>=5``.
 
 
 0.3 (2023-11-01)
