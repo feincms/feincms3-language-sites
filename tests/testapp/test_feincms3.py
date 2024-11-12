@@ -74,10 +74,10 @@ class RedirectMiddlewareTest(TestCase):
             is_active=True,
         )
 
-        response = self.client.get("/de/", HTTP_HOST="de.example.com")
+        response = self.client.get("/de/", headers={"host": "de.example.com"})
         self.assertContains(response, "<h1>de</h1>")
 
-        response = self.client.get("/de/", HTTP_HOST="fr.example.com")
+        response = self.client.get("/de/", headers={"host": "fr.example.com"})
         self.assertEqual(response.status_code, 404)
 
         response = self.client.get("/de/")
@@ -98,11 +98,15 @@ class RedirectMiddlewareTest(TestCase):
             self.assertEqual(response.status_code, 301)
             self.assertEqual(response["Location"], "https://de.example.com/de/")
 
-            response = self.client.get("/de/", HTTP_HOST="de.example.com", secure=False)
+            response = self.client.get(
+                "/de/", headers={"host": "de.example.com"}, secure=False
+            )
             self.assertEqual(response.status_code, 301)
             self.assertEqual(response["Location"], "https://de.example.com/de/")
 
-            response = self.client.get("/de/", HTTP_HOST="de.example.com", secure=True)
+            response = self.client.get(
+                "/de/", headers={"host": "de.example.com"}, secure=True
+            )
             self.assertEqual(response.status_code, 200)
 
         with override_settings(SECURE_SSL_REDIRECT=False):
@@ -114,10 +118,14 @@ class RedirectMiddlewareTest(TestCase):
             self.assertEqual(response.status_code, 301)
             self.assertEqual(response["Location"], "https://de.example.com/de/")
 
-            response = self.client.get("/de/", HTTP_HOST="de.example.com", secure=False)
+            response = self.client.get(
+                "/de/", headers={"host": "de.example.com"}, secure=False
+            )
             self.assertEqual(response.status_code, 200)
 
-            response = self.client.get("/de/", HTTP_HOST="de.example.com", secure=True)
+            response = self.client.get(
+                "/de/", headers={"host": "de.example.com"}, secure=True
+            )
             self.assertEqual(response.status_code, 200)
 
         # self.assertContains(response, "<h1>de</h1>")
