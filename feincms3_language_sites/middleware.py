@@ -46,7 +46,7 @@ def redirect_to_site_middleware(get_response):
                 else HttpResponsePermanentRedirect
             )
             return redirect_class(
-                f'{protocol}://{request.site["host"]}{request.get_full_path()}'
+                f"{protocol}://{request.site['host']}{request.get_full_path()}"
             )
 
         return get_response(request)

@@ -45,6 +45,20 @@ class SiteMiddlewareTest(TestCase):
         )
         self.assertEqual(self.client.get("/de/").status_code, 400)
 
+    @override_settings(SITES={"de": {"host": "blub.example.com"}})
+    def test_case_insensitive(self):
+        page = Page.objects.create(
+            title="home",
+            slug="home",
+            path="/de/",
+            static_path=True,
+            language_code="de",
+            is_active=True,
+        )
+        response = self.client.get("/de/", headers={"host": "Blub.Example.Com"})
+        self.assertContains(response, "home - testapp")
+        self.assertEqual(page.get_absolute_url(), "http://blub.example.com/de/")
+
 
 @override_settings(
     MIDDLEWARE=settings.MIDDLEWARE

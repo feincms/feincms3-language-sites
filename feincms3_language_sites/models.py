@@ -22,9 +22,9 @@ def site_for_host(host):
     for language_code, site in settings.SITES.items():
         site.setdefault("language_code", language_code)
         if "host_re" in site:
-            if re.search(site["host_re"], host):
+            if re.search(site["host_re"], host, re.I):
                 return site
-        elif site["host"] == host:
+        elif site["host"].lower() == host.lower():
             return site
     return None
 

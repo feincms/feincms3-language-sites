@@ -5,6 +5,9 @@ Change log
 Next version
 ~~~~~~~~~~~~
 
+- Changed host name matching to be case insensitive.
+
+
 0.4 (2024-11-12)
 ~~~~~~~~~~~~~~~~
 
