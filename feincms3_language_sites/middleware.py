@@ -5,7 +5,7 @@ from django.utils import translation
 
 
 def site_middleware(get_response):
-    from feincms3_language_sites.models import site_for_host
+    from feincms3_language_sites.models import site_for_host  # noqa: PLC0415
 
     def middleware(request):
         request.site = site_for_host(request.get_host())
