@@ -6,7 +6,7 @@ Next version
 ~~~~~~~~~~~~
 
 - Changed host name matching to be case insensitive.
-- Added Django 5.2a1.
+- Added Django 5.2, 6.0.
 
 
 0.4 (2024-11-12)

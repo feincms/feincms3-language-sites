@@ -12,6 +12,7 @@ from feincms3_language_sites.models import (
     apps_urlconfs,
     cache,
     reverse_language_site_app,
+    site_for_host,
 )
 from feincms3_language_sites.templatetags.feincms3_language_sites import (
     site_translations,
@@ -58,6 +59,72 @@ class SiteMiddlewareTest(TestCase):
         response = self.client.get("/de/", headers={"host": "Blub.Example.Com"})
         self.assertContains(response, "home - testapp")
         self.assertEqual(page.get_absolute_url(), "http://blub.example.com/de/")
+
+
+@override_settings(
+    MIDDLEWARE=settings.MIDDLEWARE
+    + ["feincms3_language_sites.middleware.redirect_to_site_middleware"],
+    SITES={
+        "de": {"host": "de.example.com"},
+        "fr": {"host": "fr.example.com"},
+    },
+)
+class PortHandlingTest(TestCase):
+    def setUp(self):
+        Page.objects.create(
+            title="home",
+            slug="home",
+            path="/de/",
+            static_path=True,
+            language_code="de",
+            is_active=True,
+        )
+
+    def test_site_for_host_strips_port_80(self):
+        with override_settings(SITES={"de": {"host": "de.example.com"}}):
+            self.assertEqual(
+                site_for_host("de.example.com:80"),
+                {"host": "de.example.com", "language_code": "de"},
+            )
+
+    def test_site_for_host_strips_port_443(self):
+        with override_settings(SITES={"de": {"host": "de.example.com"}}):
+            self.assertEqual(
+                site_for_host("de.example.com:443"),
+                {"host": "de.example.com", "language_code": "de"},
+            )
+
+    def test_site_for_host_strips_port_80_with_host_re(self):
+        with override_settings(
+            SITES={"de": {"host": "de.example.com", "host_re": r"de\.example\.com"}}
+        ):
+            result = site_for_host("de.example.com:80")
+            self.assertIsNotNone(result)
+            self.assertEqual(result["host"], "de.example.com")
+
+    def test_site_for_host_keeps_nonstandard_port(self):
+        with override_settings(SITES={"de": {"host": "de.example.com"}}):
+            self.assertIsNone(site_for_host("de.example.com:8080"))
+
+    def test_middleware_port_80(self):
+        response = self.client.get("/de/", headers={"host": "de.example.com:80"})
+        self.assertContains(response, "home - testapp")
+
+    def test_middleware_port_443(self):
+        response = self.client.get(
+            "/de/", headers={"host": "de.example.com:443"}, secure=True
+        )
+        self.assertContains(response, "home - testapp")
+
+    def test_middleware_port_80_no_redirect(self):
+        response = self.client.get("/de/", headers={"host": "de.example.com:80"})
+        self.assertEqual(response.status_code, 200)
+
+    def test_middleware_port_443_no_redirect(self):
+        response = self.client.get(
+            "/de/", headers={"host": "de.example.com:443"}, secure=True
+        )
+        self.assertEqual(response.status_code, 200)
 
 
 @override_settings(

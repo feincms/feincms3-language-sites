@@ -22,6 +22,8 @@ def site_middleware(get_response):
 
 
 def redirect_to_site_middleware(get_response):
+    from feincms3_language_sites.models import _strip_default_port  # noqa: PLC0415
+
     def middleware(request):
         if not hasattr(request, "site"):
             raise ImproperlyConfigured(
@@ -33,7 +35,7 @@ def redirect_to_site_middleware(get_response):
         # Do a redirect if
         # - Host doesn't match
         # - We should be on HTTPS but are not
-        if request.get_host() != request.site["host"] or (
+        if _strip_default_port(request.get_host()) != request.site["host"] or (
             settings.SECURE_SSL_REDIRECT and not request.is_secure()
         ):
             if settings.SECURE_SSL_REDIRECT or request.is_secure():
