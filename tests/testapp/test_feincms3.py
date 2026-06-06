@@ -60,6 +60,20 @@ class SiteMiddlewareTest(TestCase):
         self.assertContains(response, "home - testapp")
         self.assertEqual(page.get_absolute_url(), "http://blub.example.com/de/")
 
+    @override_settings(SITES={"de": {"host": "blub.example.com"}})
+    def test_host_with_trailing_dot(self):
+        page = Page.objects.create(
+            title="home",
+            slug="home",
+            path="/de/",
+            static_path=True,
+            language_code="de",
+            is_active=True,
+        )
+        response = self.client.get("/de/", headers={"host": "blub.example.com."})
+        self.assertContains(response, "home - testapp")
+        self.assertEqual(page.get_absolute_url(), "http://blub.example.com/de/")
+
 
 @override_settings(
     MIDDLEWARE=settings.MIDDLEWARE
@@ -105,6 +119,13 @@ class PortHandlingTest(TestCase):
     def test_site_for_host_keeps_nonstandard_port(self):
         with override_settings(SITES={"de": {"host": "de.example.com"}}):
             self.assertIsNone(site_for_host("de.example.com:8080"))
+
+    def test_site_for_host_strips_trailing_dot(self):
+        with override_settings(SITES={"de": {"host": "de.example.com"}}):
+            self.assertEqual(
+                site_for_host("de.example.com."),
+                {"host": "de.example.com", "language_code": "de"},
+            )
 
     def test_middleware_port_80(self):
         response = self.client.get("/de/", headers={"host": "de.example.com:80"})

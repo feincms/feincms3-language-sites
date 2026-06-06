@@ -18,24 +18,25 @@ def _protocol():
     return "https:" if settings.SECURE_SSL_REDIRECT else "http:"
 
 
-def _strip_default_port(host):
+def _normalize_host(host):
     """
     Strip port 80 and 443 from a host string since they are the default ports
     for HTTP and HTTPS respectively and are often omitted in site configurations.
+    Also normalize an optional trailing dot.
     """
     if host.startswith("["):
         # IPv6 address in brackets, e.g. [::1]:80
         if host.endswith((":80", ":443")):
-            return host.rsplit(":", 1)[0]
+            host = host.rsplit(":", 1)[0]
     elif ":" in host:
         domain, port = host.rsplit(":", 1)
         if port in ("80", "443"):
-            return domain
-    return host
+            host = domain
+    return host.removesuffix(".")
 
 
 def site_for_host(host):
-    host = _strip_default_port(host)
+    host = _normalize_host(host)
     for language_code, site in settings.SITES.items():
         site.setdefault("language_code", language_code)
         if "host_re" in site:
