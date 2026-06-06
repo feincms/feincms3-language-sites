@@ -5,7 +5,8 @@ Change log
 Next version
 ~~~~~~~~~~~~
 
-- Changed host name matching to be case insensitive.
+- Changed host name matching to be case insensitive, remove default HTTP/S
+  ports and strip trailing dots.
 - Added Django 5.2, 6.0.
 
 
