@@ -40,7 +40,7 @@ def site_for_host(host):
     for language_code, site in settings.SITES.items():
         site.setdefault("language_code", language_code)
         if "host_re" in site:
-            if re.search(site["host_re"], host, re.I):
+            if re.search(site["host_re"], host, re.IGNORECASE):
                 return site
         elif site["host"].lower() == host.lower():
             return site
