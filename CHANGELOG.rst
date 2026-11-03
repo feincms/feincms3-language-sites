@@ -7,7 +7,9 @@ Next version
 
 - Changed host name matching to be case insensitive, remove default HTTP/S
   ports and strip trailing dots.
-- Added Django 5.2, 6.0.
+- Added Django 5.2, 6.0, 6.1.
+- Added Python 3.14, 3.15.
+- Removed Django 5.0 from the CI.
 
 
 0.4 (2024-11-12)
